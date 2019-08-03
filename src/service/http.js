@@ -48,4 +48,4 @@ class Http {
   delete = axios.delete
 }
 
-export const http = new Http();
+export default new Http();

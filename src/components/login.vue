@@ -145,14 +145,13 @@
 
         .captcha-row {
           display: flex;
-
+          height: 40px;
           .el-input {
             flex: 1;
             margin-right: 10px;
           }
         }
       }
-
 
     }
   }

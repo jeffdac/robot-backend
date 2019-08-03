@@ -91,7 +91,7 @@
     },
     computed: {
       navigationTip() {
-        console.log(this.$route);
+        // console.log(this.$route);
         return this.$route.meta.text ? ` / ${this.$route.meta.text}` : '';
       },
       foldIcon() {

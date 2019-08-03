@@ -1,15 +1,15 @@
 <template>
   <el-card>
     <div slot="header" class="header">
-      <el-form :inline="true" :model="searchInfo">
+      <el-form :inline="true" :model="filter">
         <el-form-item label="ID">
-          <el-input v-model="searchInfo.id" placeholder="请输入"></el-input>
+          <el-input v-model="filter.id" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="机器人QQ">
-          <el-input v-model="searchInfo.robot_qq" placeholder="请输入"></el-input>
+          <el-input v-model="filter.robot_qq" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="主人QQ">
-          <el-input v-model="searchInfo.master_qq" placeholder="请输入"></el-input>
+          <el-input v-model="filter.master_qq" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search"></el-button>
@@ -25,32 +25,74 @@
       :data="tableData"
       tooltip-effect="dark"
       style="width: 100%"
+      size="medium"
       :header-cell-style="{backgroundColor:'#F5F7FA'}"
-      border="true"
+      :border="true"
       @selection-change="handleSelectionChange"
-      :default-sort="{prop: 'date', order: 'descending'}">
+      :default-sort="{prop: 'id', order: 'descending'}">
       <el-table-column
         type="selection"
-        width="55">
+        width="35">
       </el-table-column>
       <el-table-column
-        prop="date"
+        prop="id"
         sortable
-        label="日期"
-        width="120">
-        <template slot-scope="scope">{{ scope.row.date }}</template>
+        label="ID"
+        width="70">
+        <template slot-scope="scope">{{ scope.row.id }}</template>
       </el-table-column>
       <el-table-column
-        prop="name"
-        label="姓名"
-        width="120">
+        prop="robot_qq"
+        label="机器人QQ">
       </el-table-column>
       <el-table-column
-        prop="address"
-        label="地址"
+        prop="master_qq"
+        label="主人QQ"
         show-overflow-tooltip>
       </el-table-column>
+      <el-table-column
+        prop="user_qq"
+        label="授权人QQ"
+        show-overflow-tooltip>
+      </el-table-column>
+      <el-table-column
+        prop="end_time"
+        label="到期时间"
+        show-overflow-tooltip>
+      </el-table-column>
+      <el-table-column
+        prop="created_at"
+        label="创建时间"
+        show-overflow-tooltip>
+      </el-table-column>
+      <el-table-column
+        prop="auth_status_text"
+        label="状态"
+        show-overflow-tooltip>
+      </el-table-column>
+      <el-table-column
+        prop="operate"
+        label="操作"
+        width="215"
+        show-overflow-tooltip>
+        <template>
+          <el-button size="mini" type="primary">续费</el-button>
+          <el-button size="mini" type="success">编辑</el-button>
+          <el-button size="mini" type="danger">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
+    <el-pagination
+      style="margin-top: 10px"
+      background
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="Math.ceil(total/filter.limit)"
+      :page-sizes="[10, 20, 30, 40, 50, 60, 70, 80, 90]"
+      :page-size="filter.limit"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
 </template>
 
@@ -59,44 +101,32 @@
     name: "auth",
     data() {
       return {
-        searchInfo: {
+        filter: {
+          page: 1,
+          limit: 10,
           id: '',
           robot_qq: '',
           master_qq: '',
         },
-        tableData: [{
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }],
+        tableData: [],
+        total: 0,
         multipleSelection: []
       }
     },
+    mounted() {
+      this.getAuthData();
+    },
     methods: {
+      async getAuthData() {
+        try {
+          let res = await this.$http.get('plugin_auths');
+          this.tableData = res.data;
+          this.total = res.count;
+          console.log(this.tableData, '==========');
+        } catch (e) {
+
+        }
+      },
       toggleSelection(rows) {
         if (rows) {
           rows.forEach(row => {
@@ -108,6 +138,12 @@
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
+      },
+      handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+      },
+      handleCurrentChange(val) {
+        console.log(`当前页: ${val}`);
       }
     }
   }

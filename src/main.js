@@ -8,7 +8,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'element-ui/lib/theme-chalk/display.css';
 
-import {http} from './service/http'
+import http from './service/http'
 
 
 Vue.use(ElementUI);
