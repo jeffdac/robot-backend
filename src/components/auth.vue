@@ -12,13 +12,13 @@
           <el-input v-model="filter.master_qq" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-search"></el-button>
+          <el-button type="primary" icon="el-icon-search" @click="getAuthData"></el-button>
         </el-form-item>
       </el-form>
     </div>
     <div class="buttons">
-      <el-button type="primary">删除</el-button>
-      <el-button type="primary">添加</el-button>
+      <el-button type="primary" @click="batchDeleteAuth">批量删除</el-button>
+      <el-button type="primary" @click="openDialogFrom">添加</el-button>
     </div>
     <el-table
       ref="multipleTable"
@@ -75,10 +75,10 @@
         label="操作"
         width="215"
         show-overflow-tooltip>
-        <template>
+        <template slot-scope="scope">
           <el-button size="mini" type="primary">续费</el-button>
-          <el-button size="mini" type="success">编辑</el-button>
-          <el-button size="mini" type="danger">删除</el-button>
+          <el-button size="mini" type="success" @click="editDialogFrom(scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="deleteAuth(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,13 +87,41 @@
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="Math.ceil(total/filter.limit)"
-      :page-sizes="[10, 20, 30, 40, 50, 60, 70, 80, 90]"
+      :current-page="filter.page"
+      :page-sizes="[1, 2, 3, 4, 5, 6, 7, 8, 9]"
       :page-size="filter.limit"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+    <el-dialog :title="isAddForm?'添加授权':'编辑授权'" :visible.sync="dialogFormVisible" width="40%">
+      <el-form :model="authInfo">
+        <el-form-item label="机器人QQ" :label-width="formLabelWidth">
+          <el-input v-model="authInfo.robot_qq" autocomplete="off"></el-input>
+        </el-form-item>
+        <template v-if="isAddForm">
+          <el-form-item label="主人QQ" :label-width="formLabelWidth">
+            <el-input v-model="authInfo.master_qq" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="授权时长" :label-width="formLabelWidth">
+            <el-select value="1" v-model="authInfo.month" placeholder="请选择授权时长" @change="checkPrice">
+              <el-option label="1个月" value="1"></el-option>
+              <el-option label="3个月" value="3"></el-option>
+              <el-option label="6个月" value="6"></el-option>
+              <el-option label="12个月" value="12"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="所需费用" :label-width="formLabelWidth">
+            <el-input v-model="authInfo.price" readonly autocomplete="off"></el-input>
+          </el-form-item>
+        </template>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addOrEditAuth">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
+
 </template>
 
 <script>
@@ -110,7 +138,17 @@
         },
         tableData: [],
         total: 0,
-        multipleSelection: []
+        multipleSelection: [],
+        dialogFormVisible: false,
+        isAddForm: true,
+        authInfo: {
+          id: '',
+          robot_qq: '',
+          master_qq: '',
+          month: '1',
+          price: 4,
+        },
+        formLabelWidth: '120px'
       }
     },
     mounted() {
@@ -119,7 +157,7 @@
     methods: {
       async getAuthData() {
         try {
-          let res = await this.$http.get('plugin_auths');
+          let res = await this.$http.get('plugin_auths', this.filter);
           this.tableData = res.data;
           this.total = res.count;
           console.log(this.tableData, '==========');
@@ -127,13 +165,55 @@
 
         }
       },
-      toggleSelection(rows) {
-        if (rows) {
-          rows.forEach(row => {
-            this.$refs.multipleTable.toggleRowSelection(row);
-          });
-        } else {
-          this.$refs.multipleTable.clearSelection();
+      openDialogFrom() {
+        this.isAddForm = true;
+        this.authInfo = {id: '', robot_qq: '', master_qq: '', month: '1', price: 4};
+        this.dialogFormVisible = true;
+        this.checkPrice();
+      },
+      editDialogFrom(row) {
+        this.isAddForm = false;
+        console.log(row);
+        this.authInfo.id = row.id;
+        this.authInfo.robot_qq = row.robot_qq;
+        this.dialogFormVisible = true;
+      },
+      async checkPrice() {
+        try {
+          let res = await this.$http.get('month_price', {month: this.authInfo.month});
+          this.authInfo.price = res.data.month_price;
+        } catch (e) {
+          this.$message('查询价格失败')
+        }
+      },
+      async addOrEditAuth() {
+        try {
+          if (this.isAddForm) {
+            await this.$http.post('plugin_auths', this.authInfo);
+          } else {
+            await this.$http.post(`plugin_auths/${this.authInfo.id}`, {robot_qq: this.authInfo.robot_qq});
+          }
+          await this.getAuthData();
+          this.dialogFormVisible = false;
+        } catch (e) {
+          this.$message(this.isAddForm ? '添加失败' : '修改失败');
+        }
+      },
+      async deleteAuth(id) {
+        try {
+          await this.$http.delete(`plugin_auths/${id}`);
+          await this.getAuthData();
+          this.dialogFormVisible = false;
+        } catch (e) {
+          this.$message('删除失败')
+        }
+      },
+      async batchDeleteAuth() {
+        try {
+          await this.$http.post('plugin_auths/batch_delete', {ids: this.multipleSelection.map(item => item.id)});
+          await this.getAuthData();
+        } catch (e) {
+          this.$message('批量删除失败')
         }
       },
       handleSelectionChange(val) {
@@ -141,9 +221,14 @@
       },
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`);
+        this.filter.page = 1;
+        this.filter.limit = val;
+        this.getAuthData()
       },
       handleCurrentChange(val) {
         console.log(`当前页: ${val}`);
+        this.filter.page = val;
+        this.getAuthData();
       }
     }
   }
@@ -156,5 +241,9 @@
 
   .buttons {
     margin-bottom: 15px;
+  }
+
+  .el-select {
+    display: block;
   }
 </style>
