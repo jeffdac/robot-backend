@@ -25,6 +25,10 @@
           <i class="el-icon-lock"></i>
           <span>卡密管理</span>
         </el-menu-item>
+        <el-menu-item index="/admin">
+          <i class="el-icon-s-custom"></i>
+          <span>后台管理员</span>
+        </el-menu-item>
       </el-menu>
 
     </el-aside>
@@ -58,7 +62,12 @@
       <el-main style="background-color: #f7f7f7">
         <router-view></router-view>
       </el-main>
-      <el-footer>Footer</el-footer>
+      <el-footer>
+        <div class="footer-text-wrapper">
+          <span>Copyright © 2019 PRIVATE. All Rights Reserved. </span>
+          <span>Powered by PRIVATE TEAM </span>
+        </div>
+      </el-footer>
     </el-container>
   </el-container>
 
@@ -110,7 +119,7 @@
         }
       },
       handleCommand(command) {
-        if(command==='logout'){
+        if (command === 'logout') {
           this.logout();
         }
       },
@@ -171,4 +180,12 @@
     }
   }
 
+  .footer-text-wrapper {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    color: #555;
+  }
 </style>

@@ -5,6 +5,7 @@ import Login from '../components/login'
 import Home from '../components/home'
 import Auth from '../components/auth'
 import Card from '../components/card'
+import Admin from '../components/admin'
 import UserInfo from '../components/setting/userInfo'
 import Password from '../components/setting/password'
 import Four04 from '../components/four04'
@@ -48,6 +49,14 @@ export default new Router({
           component: Card,
           meta: {
             text: '卡密管理',
+          }
+        },
+        {
+          path: 'admin',
+          name: 'admin',
+          component: Admin,
+          meta: {
+            text: '用户 / 管理员',
           }
         },
         {

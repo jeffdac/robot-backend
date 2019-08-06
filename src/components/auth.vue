@@ -17,8 +17,8 @@
       </el-form>
     </div>
     <div class="buttons">
-      <el-button type="primary" @click="batchDeleteAuth">批量删除</el-button>
-      <el-button type="primary" @click="openDialogFrom">添加</el-button>
+      <el-button type="primary" :disabled="!multipleSelection.length" @click="batchDeleteAuth">批量删除</el-button>
+      <el-button type="primary" @click="openAddDialogForm">添加</el-button>
     </div>
     <el-table
       ref="multipleTable"
@@ -77,7 +77,7 @@
         show-overflow-tooltip>
         <template slot-scope="scope">
           <el-button size="mini" type="primary">续费</el-button>
-          <el-button size="mini" type="success" @click="editDialogFrom(scope.row)">编辑</el-button>
+          <el-button size="mini" type="success" @click="openEditDialogForm(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="deleteAuth(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -88,12 +88,12 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="filter.page"
-      :page-sizes="[1, 2, 3, 4, 5, 6, 7, 8, 9]"
+      :page-sizes="[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => num * filter.limit)"
       :page-size="filter.limit"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
-    <el-dialog :title="isAddForm?'添加授权':'编辑授权'" :visible.sync="dialogFormVisible" width="40%">
+    <el-dialog :title="isAddForm?'添加授权':'编辑授权'" :visible.sync="dialogFormVisible" width="500px">
       <el-form :model="authInfo">
         <el-form-item label="机器人QQ" :label-width="formLabelWidth">
           <el-input v-model="authInfo.robot_qq" autocomplete="off"></el-input>
@@ -160,18 +160,17 @@
           let res = await this.$http.get('plugin_auths', this.filter);
           this.tableData = res.data;
           this.total = res.count;
-          console.log(this.tableData, '==========');
         } catch (e) {
 
         }
       },
-      openDialogFrom() {
+      openAddDialogForm() {
         this.isAddForm = true;
         this.authInfo = {id: '', robot_qq: '', master_qq: '', month: '1', price: 4};
         this.dialogFormVisible = true;
         this.checkPrice();
       },
-      editDialogFrom(row) {
+      openEditDialogForm(row) {
         this.isAddForm = false;
         console.log(row);
         this.authInfo.id = row.id;
@@ -201,17 +200,22 @@
       },
       async deleteAuth(id) {
         try {
-          await this.$http.delete(`plugin_auths/${id}`);
-          await this.getAuthData();
-          this.dialogFormVisible = false;
+          this.$confirm('确定删除授权吗？', '提示', {type: 'warning'}).then(async () => {
+            await this.$http.delete(`plugin_auths/${id}`);
+            await this.getAuthData();
+          }).catch(() => {
+          });
         } catch (e) {
           this.$message('删除失败')
         }
       },
       async batchDeleteAuth() {
         try {
-          await this.$http.post('plugin_auths/batch_delete', {ids: this.multipleSelection.map(item => item.id)});
-          await this.getAuthData();
+          this.$confirm('确定删除授权吗？', '提示', {type: 'warning'}).then(async () => {
+            await this.$http.post('plugin_auths/batch_delete', {ids: this.multipleSelection.map(item => item.id)});
+            await this.getAuthData();
+          }).catch(() => {
+          });
         } catch (e) {
           this.$message('批量删除失败')
         }
