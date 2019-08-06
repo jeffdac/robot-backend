@@ -90,11 +90,12 @@
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             try {
-              let res = await this.$http.post('login', this.ruleForm);
-              let token = res.data.token;
+              let res = (await this.$http.post('login', this.ruleForm)).data;
+              let token = res.token;
               localStorage.setItem('token', `${token.token_type} ${token.access_token}`);
               localStorage.setItem('expires_in', new Date().getTime() + token.expires_in * 1000);
-              this.$router.push({name: 'home', params: res.data.user});
+              this.$store.commit('setUser', res.user);
+              this.$router.push({name: 'home', params: res.user});
             } catch (e) {
               this.$message({type: 'error', message: e.msg})
             }

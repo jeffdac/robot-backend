@@ -109,7 +109,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="所需费用" :label-width="formLabelWidth">
-          <el-input v-model="cardInfo.price" readonly autocomplete="off"></el-input>
+          <el-input v-model="cardInfo.price" disabled autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

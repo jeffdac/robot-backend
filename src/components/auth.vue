@@ -111,7 +111,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="所需费用" :label-width="formLabelWidth">
-            <el-input v-model="authInfo.price" readonly autocomplete="off"></el-input>
+            <el-input v-model="authInfo.price" disabled autocomplete="off"></el-input>
           </el-form-item>
         </template>
       </el-form>

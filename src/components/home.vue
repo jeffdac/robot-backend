@@ -5,12 +5,12 @@
         <div>
           <el-row class="user-info">
             <el-col :xs="5" :sm="6" :md="6" :lg="4" :xl="4">
-              <el-image class="avatar" :src="'http://auth.51godream.com/images/default_avatar.jpg'"></el-image>
+              <el-image class="avatar" :src="user.avatar"></el-image>
             </el-col>
             <el-col :xs="19" :sm="18" :md="18" :lg="20" :xl="20">
-              <div>授权商</div>
-              <div>ID：3</div>
-              <div>角色：授权商</div>
+              <div>{{user.nickname}}</div>
+              <div>ID：{{user.id}}</div>
+              <div>角色：{{user.role_text}}</div>
             </el-col>
           </el-row>
           <el-row class="balance">
@@ -18,7 +18,7 @@
               账户余额
             </el-col>
             <el-col :span="4">
-              <el-button size="mini" icon="el-icon-coin" style="float: right;" class="balance-btn">20</el-button>
+              <el-button size="mini" icon="el-icon-coin" style="float: right;" class="balance-btn">{{user.balance}}</el-button>
               <el-button size="mini" type="primary" style="float: right;">充值</el-button>
             </el-col>
           </el-row>
@@ -68,15 +68,13 @@
     data() {
       return {}
     },
-    methods: {
-      async getUser() {
-        try {
-          let res = await this.$http.get('me');
-          console.log(res.data);
-        } catch (e) {
-
-        }
+    computed:{
+      user() {
+        return this.$store.state.user;
       }
+    },
+    methods: {
+
     }
   }
 </script>
