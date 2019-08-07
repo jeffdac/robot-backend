@@ -76,7 +76,7 @@
         width="215"
         show-overflow-tooltip>
         <template slot-scope="scope">
-          <el-button size="mini" type="primary">续费</el-button>
+          <el-button size="mini" type="primary" @click="openRenewDialogForm(scope.row)">续费</el-button>
           <el-button size="mini" type="success" @click="openEditDialogForm(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="deleteAuth(scope.row.id)">删除</el-button>
         </template>
@@ -93,13 +93,14 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
-    <el-dialog :title="isAddForm?'添加授权':'编辑授权'" :visible.sync="dialogFormVisible" width="500px">
+    <el-dialog :title="dialogType === 1 ? '添加授权' : (dialogType === 2 ? '编辑授权' : '续费授权')"
+               :visible.sync="dialogFormVisible" width="500px">
       <el-form :model="authInfo">
         <el-form-item label="机器人QQ" :label-width="formLabelWidth">
           <el-input v-model="authInfo.robot_qq" autocomplete="off"></el-input>
         </el-form-item>
-        <template v-if="isAddForm">
-          <el-form-item label="主人QQ" :label-width="formLabelWidth">
+        <template v-if="dialogType !== 2">
+          <el-form-item v-if="dialogType === 1" label="主人QQ" :label-width="formLabelWidth">
             <el-input v-model="authInfo.master_qq" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="授权时长" :label-width="formLabelWidth">
@@ -117,7 +118,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addOrEditAuth">确 定</el-button>
+        <el-button type="primary" @click="addOrRenewOrEditAuth">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -140,7 +141,7 @@
         total: 0,
         multipleSelection: [],
         dialogFormVisible: false,
-        isAddForm: true,
+        dialogType: 1,
         authInfo: {
           id: '',
           robot_qq: '',
@@ -161,18 +162,23 @@
           this.tableData = res.data;
           this.total = res.count;
         } catch (e) {
-
+          this.$message({type: 'error', message: e.msg});
         }
       },
       openAddDialogForm() {
-        this.isAddForm = true;
+        this.dialogType = 1;
         this.authInfo = {id: '', robot_qq: '', master_qq: '', month: '1', price: 4};
         this.dialogFormVisible = true;
         this.checkPrice();
       },
+      openRenewDialogForm(row) {
+        this.dialogType = 3;
+        this.authInfo = {id: row.id, robot_qq: row.robot_qq, master_qq: row.mon, month: '1', price: 4};
+        this.dialogFormVisible = true;
+        this.checkPrice();
+      },
       openEditDialogForm(row) {
-        this.isAddForm = false;
-        console.log(row);
+        this.dialogType = 2;
         this.authInfo.id = row.id;
         this.authInfo.robot_qq = row.robot_qq;
         this.dialogFormVisible = true;
@@ -182,20 +188,22 @@
           let res = await this.$http.get('month_price', {month: this.authInfo.month});
           this.authInfo.price = res.data.month_price;
         } catch (e) {
-          this.$message('查询价格失败')
+          this.$message({type: 'error', message: e.msg});
         }
       },
-      async addOrEditAuth() {
+      async addOrRenewOrEditAuth() {
         try {
-          if (this.isAddForm) {
+          if (this.dialogType === 1) {
             await this.$http.post('plugin_auths', this.authInfo);
-          } else {
+          } else if (this.dialogType === 2) {
             await this.$http.post(`plugin_auths/${this.authInfo.id}`, {robot_qq: this.authInfo.robot_qq});
+          } else if (this.dialogType === 3) {
+            await this.$http.post(`plugin_auths/${this.authInfo.id}/renew`, this.authInfo);
           }
           await this.getAuthData();
           this.dialogFormVisible = false;
         } catch (e) {
-          this.$message(this.isAddForm ? '添加失败' : '修改失败');
+          this.$message({type: 'error', message: e.msg});
         }
       },
       async deleteAuth(id) {
@@ -206,7 +214,7 @@
           }).catch(() => {
           });
         } catch (e) {
-          this.$message('删除失败')
+          this.$message({type: 'error', message: e.msg});
         }
       },
       async batchDeleteAuth() {
@@ -217,20 +225,20 @@
           }).catch(() => {
           });
         } catch (e) {
-          this.$message('批量删除失败')
+          this.$message({type: 'error', message: e.msg});
         }
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
       handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+        // console.log(`每页 ${val} 条`);
         this.filter.page = 1;
         this.filter.limit = val;
         this.getAuthData()
       },
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+        // console.log(`当前页: ${val}`);
         this.filter.page = val;
         this.getAuthData();
       }

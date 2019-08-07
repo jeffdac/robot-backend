@@ -18,15 +18,15 @@
               账户余额
             </el-col>
             <el-col :span="4">
-              <el-button size="mini" icon="el-icon-coin" style="float: right;" class="balance-btn">{{user.balance}}</el-button>
-              <el-button size="mini" type="primary" style="float: right;">充值</el-button>
+              <el-button size="mini" icon="el-icon-coin" style="float: right;" class="balance-btn">{{user.balance}}
+              </el-button>
+              <el-button @click="recharge" size="mini" type="primary" style="float: right;">充值</el-button>
             </el-col>
           </el-row>
         </div>
       </el-card>
     </el-col>
     <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-
       <el-card :body-style="{'padding-bottom':0,'padding-top':'10px'}">
         <div class="notice">
           平台公告<span class="items-number">3</span>
@@ -68,13 +68,15 @@
     data() {
       return {}
     },
-    computed:{
+    computed: {
       user() {
         return this.$store.state.user;
       }
     },
     methods: {
-
+      recharge() {
+        this.$router.push('recharge');
+      }
     }
   }
 </script>
@@ -99,6 +101,13 @@
     margin: 10px 0 10px;
   }
 
+  .balance-btn:hover, .balance-btn:focus {
+    background-color: #fff;
+    border-color: #DCDFE6;
+    color: #606266;
+    cursor: default
+  }
+
   .notice {
     position: relative;
     margin-left: -20px;
@@ -115,7 +124,7 @@
       width: 100%;
       border-bottom: 1px solid #e6e6e6;
     }
-    .items-number{
+    .items-number {
       background-color: #333;
       color: #fff;
       padding: 0 6px;

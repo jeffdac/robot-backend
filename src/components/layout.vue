@@ -25,7 +25,7 @@
           <i class="el-icon-lock"></i>
           <span>卡密管理</span>
         </el-menu-item>
-        <el-menu-item index="/admin">
+        <el-menu-item v-if="user.role === 'super_admin'" index="/admin">
           <i class="el-icon-s-custom"></i>
           <span>后台管理员</span>
         </el-menu-item>
@@ -37,7 +37,7 @@
         <el-row type="flex" justify="space-between" align="middle" class="header-tool-bar">
           <div>
             <i :class="[foldIcon?'el-icon-s-unfold':'el-icon-s-fold']" @click="toggleSideMenu"></i>
-            <i class="el-icon-refresh-right"></i>
+            <!--<i class="el-icon-refresh-right"></i>-->
           </div>
           <el-dropdown @command="handleCommand">
             <span class="el-dropdown-link">
@@ -81,10 +81,11 @@
         isCollapse: false,
         hiddenSmDown: true,
         clientWidth: document.body.clientWidth,
-        homeText: '首页'
+        homeText: '首页',
       }
     },
     mounted() {
+      this.getUser();
       window.onresize = (event) => {
         if (event.target.innerWidth < this.clientWidth) {
           this.clientWidth = event.target.innerWidth;
@@ -97,7 +98,6 @@
           this.isCollapse = false;
         }
       };
-      console.log(this.$store.state, '***********');
     },
     computed: {
       navigationTip() {
@@ -124,6 +124,14 @@
       handleCommand(command) {
         if (command === 'logout') {
           this.logout();
+        }
+      },
+      async getUser() {
+        try {
+          let res = await this.$http.get('me');
+          this.$store.commit('setUser', res.data);
+        } catch (e) {
+          this.$message({type: 'error', message: e.msg});
         }
       },
       logout() {
@@ -163,7 +171,9 @@
   .header-tool-bar {
     border-bottom: 1px solid #ccc;
     padding: 0 15px;
-
+    .el-dropdown-link {
+      color: #000;
+    }
     .el-icon-s-unfold, .el-icon-s-fold, .el-icon-refresh-right {
       padding: 15px;
       font-size: 18px;

@@ -90,14 +90,16 @@
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             try {
-              let res = (await this.$http.post('login', this.ruleForm)).data;
-              let token = res.token;
+              let res = await this.$http.post('login', this.ruleForm);
+              // 由于后台在验证码错误时，返回的仍为成功状态码为200，所以这里要手动抛出错误，使catch语句能捕获到错误
+              if (res.code === 1004) throw res;
+              let token = res.data.token;
               localStorage.setItem('token', `${token.token_type} ${token.access_token}`);
               localStorage.setItem('expires_in', new Date().getTime() + token.expires_in * 1000);
-              this.$store.commit('setUser', res.user);
-              this.$router.push({name: 'home', params: res.user});
+              this.$router.push('/');
+              // this.$router.push({name: 'home', params: res.user});
             } catch (e) {
-              this.$message({type: 'error', message: e.msg})
+              this.$message({type: 'error', message: e.msg});
             }
           } else {
             console.log('error submit!!');

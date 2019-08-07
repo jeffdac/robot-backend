@@ -6,6 +6,7 @@ import Home from '../components/home'
 import Auth from '../components/auth'
 import Card from '../components/card'
 import Admin from '../components/admin'
+import Recharge from '../components/recharge'
 import UserInfo from '../components/setting/userInfo'
 import Password from '../components/setting/password'
 import Four04 from '../components/four04'
@@ -57,6 +58,14 @@ export default new Router({
           component: Admin,
           meta: {
             text: '用户 / 管理员',
+          }
+        },
+        {
+          path: 'recharge',
+          name: 'recharge',
+          component: Recharge,
+          meta: {
+            text: '充值',
           }
         },
         {

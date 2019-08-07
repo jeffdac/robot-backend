@@ -29,20 +29,29 @@
   export default {
     name: "userInfo",
     data() {
-      return {}
-    },
-    computed: {
-      user() {
-        return this.$store.state.user;
+      return {
+        user: null,
       }
     },
+    mounted() {
+      this.getUser();
+    },
     methods: {
+      async getUser() {
+        try {
+          let res = await this.$http.get('me');
+          this.user = res.data;
+        } catch (e) {
+          this.$message({type: 'error', message: e.msg});
+        }
+      },
       async modifyUserInfo() {
         try {
           let res = await this.$http.post('me', this.user);
+          this.$message({type: 'success', message: '修改成功'});
           this.$store.commit('setUser', res.data);
         } catch (e) {
-          this.$message('修改用户信息失败');
+          this.$message({type: 'error', message: e.msg});
         }
       }
     }

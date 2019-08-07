@@ -174,7 +174,7 @@
           this.tableData = res.data;
           this.total = res.count;
         } catch (e) {
-
+          this.$message({type: 'error', message: e.msg});
         }
       },
       openAddDialogForm() {
@@ -214,7 +214,7 @@
           await this.getAdmin();
           this.dialogFormVisible = false;
         } catch (e) {
-          this.$message(this.isAddForm ? '添加失败' : '修改失败');
+          this.$message({type: 'error', message: e.msg});
         }
       },
       async deleteAdmin(id) {
@@ -225,7 +225,7 @@
           }).catch(() => {
           });
         } catch (e) {
-          this.$message('删除失败')
+          this.$message({type: 'error', message: e.msg});
         }
       },
       async batchDeleteAdmin() {
@@ -236,20 +236,20 @@
           }).catch(() => {
           });
         } catch (e) {
-          this.$message('批量删除失败')
+          this.$message({type: 'error', message: e.msg});
         }
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
       handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+        // console.log(`每页 ${val} 条`);
         this.filter.page = 1;
         this.filter.limit = val;
         this.getAdmin()
       },
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+        // console.log(`当前页: ${val}`);
         this.filter.page = val;
         this.getAdmin();
       }
