@@ -145,7 +145,7 @@
         formLabelWidth: '120px'
       }
     },
-    mounted() {
+    created() {
       this.getCards();
     },
     methods: {

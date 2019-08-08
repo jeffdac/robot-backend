@@ -152,7 +152,7 @@
         formLabelWidth: '120px'
       }
     },
-    mounted() {
+    created() {
       this.getAuthData();
     },
     methods: {

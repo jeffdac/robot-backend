@@ -84,8 +84,10 @@
         homeText: '首页',
       }
     },
-    mounted() {
+    created() {
       this.getUser();
+    },
+    mounted() {
       window.onresize = (event) => {
         if (event.target.innerWidth < this.clientWidth) {
           this.clientWidth = event.target.innerWidth;

@@ -82,7 +82,7 @@
         }
       };
     },
-    mounted() {
+    created() {
       this.changeCaptcha();
     },
     methods: {

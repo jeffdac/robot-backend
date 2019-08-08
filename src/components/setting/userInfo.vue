@@ -33,7 +33,7 @@
         user: null,
       }
     },
-    mounted() {
+    created() {
       this.getUser();
     },
     methods: {

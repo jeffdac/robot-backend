@@ -164,7 +164,7 @@
         formLabelWidth: '120px'
       }
     },
-    mounted() {
+    created() {
       this.getAdmin();
     },
     methods: {
