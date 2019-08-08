@@ -95,5 +95,5 @@ export default new Router({
       component: Four04
     }
   ],
-  mode: 'history'
+  // mode: 'history'
 })
