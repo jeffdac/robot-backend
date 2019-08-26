@@ -64,8 +64,7 @@
       </el-main>
       <el-footer>
         <div class="footer-text-wrapper">
-          <span>Copyright © 2019 PRIVATE. All Rights Reserved. </span>
-          <span>Powered by PRIVATE TEAM </span>
+          <span>© copyright 2019 jeff.51godream.com </span>
         </div>
       </el-footer>
     </el-container>
@@ -198,7 +197,7 @@
   .footer-text-wrapper {
     height: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     font-size: 15px;
     color: #555;

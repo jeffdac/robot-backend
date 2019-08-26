@@ -29,7 +29,7 @@
         </el-form>
       </div>
       <footer>
-        © copyright 2018 auth.51godream.com
+        © copyright 2019 jeff.51godream.com
       </footer>
     </el-col>
 

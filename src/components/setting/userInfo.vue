@@ -30,7 +30,7 @@
     name: "userInfo",
     data() {
       return {
-        user: null,
+        user: {},
       }
     },
     created() {
