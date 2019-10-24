@@ -109,7 +109,7 @@
         return this.clientWidth < 991 ? this.hiddenSmDown : this.isCollapse
       },
       user() {
-        return this.$store.state.user;
+        return this.$store.state.user || {};
       }
     },
     methods: {
